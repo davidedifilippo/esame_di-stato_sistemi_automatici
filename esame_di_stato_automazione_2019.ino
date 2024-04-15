@@ -161,9 +161,9 @@ while(casse_immagazzinate<4)
   digitalWrite(saracinesca_scarico_liquido, LOW);
 
 //Trattamento termico 1 del composto nella cassa: alimento al 60% del valore massimo di tensione
-// ossia al 60% di 150 gradi pari a 90° per 10 minuti
+// ossia al 66% di 120 gradi pari a 90° per 10 minuti
 
-  analogWrite(piatto_Riscaldante_ControlPin, 0.6*255);
+  analogWrite(piatto_Riscaldante_ControlPin, 0.66*255);
 
   long inizio_trattamento_termico_1 = millis();
 
@@ -172,9 +172,9 @@ while(casse_immagazzinate<4)
   while((millis() - inizio_trattamento_termico_1) < tempo_limite_1);
 
   //Trattamento termico 2 del composto nella cassa: alimento al 33% del valore massimo di tensione
-  // ossia al 33% di 150 gradi pari a 50° per 5 minuti
+  // ossia al 50% di 120 gradi pari a 50° per 5 minuti
 
-  analogWrite(piatto_Riscaldante_ControlPin, 0.33*255);
+  analogWrite(piatto_Riscaldante_ControlPin, 0.5*255);
 
   long inizio_trattamento_termico_2 = millis();
 
