@@ -101,7 +101,7 @@ attachInterrupt(digitalPinToInterrupt(sensore_panetti_pin), incrementa_panetti, 
 
 void loop() {
   
-while(digitalRead(!startButtonPin)); //pull-up resistor -> se non premuto HIGH   
+while(!digitalRead(startButtonPin)); //pull-up resistor -> se non premuto HIGH   
 
 //immetto il liquido nella tramoggia
 
