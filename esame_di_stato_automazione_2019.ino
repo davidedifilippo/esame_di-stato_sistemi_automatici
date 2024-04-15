@@ -12,7 +12,8 @@ const int encoder_MAT_Y_Pin = 3;
 const int mat_X_Forward_ControlPin = 5; 
 const int mat_X_Backward_ControlPin = 6; 
 const int mat_Y_Forward_ControlPin = 7; 
-const int mat_Y_Backward_ControlPin = 8; 
+const int mat_Y_Backward_ControlPin = 8;
+const int pinza_aggancio_control_pin = PC16;
 
 //pin controllo operazioni tramoggia
 
@@ -50,6 +51,7 @@ int casse_immagazzinate = 0;
 //Variabile di stop 
 
 bool stop = false;
+bool marcia_avanti = true;
 
 /**************************************************************************/
 
@@ -57,12 +59,17 @@ bool stop = false;
 
 void incrementa_impulsi_X()
 {
+  if(marcia_avanti)
      conta_impulsi_X++;
+  else
+     conta_impulsi_X--;
     }
 
 void incrementa_impulsi_Y()
-{
+{  if(marcia_avanti)
      conta_impulsi_Y++;
+   else
+     conta_impulsi_Y--;
     }
 
 void incrementa_panetti()
@@ -189,46 +196,85 @@ while(casse_immagazzinate<4)
   switch(casse_immagazzinate)
   {
     case 0: 
-      //Aziono MAT_X per 4 secondi
-      digitalWrite(mat_X_Forward_ControlPin, HIGH);
-      delay(4000);
-      digitalWrite(mat_X_Forward_ControlPin, LOW);
+      //MAT_X avanti
+      marcia_avanti = true;
+      digitalWrite(pinza_aggancio_control_pin, HIGH);  //aggancio la cassa
+      digitalWrite(mat_X_Forward_ControlPin, HIGH);  //Motore x avanti
+      while(conta_impulsi_X <= 400);
+      digitalWrite(mat_X_Forward_ControlPin, LOW);   //stop
+      digitalWrite(pinza_aggancio_control_pin, LOW); //sgancio
       casse_immagazzinate++;
+      //MAT_X indietro
+      marcia_avanti = false;
+      digitalWrite(mat_X_Backward_ControlPin, HIGH);  //Motore x indietro
+      while(conta_impulsi_X >= 0); //Ritorno alla posizione iniziale
+      digitalWrite(mat_X_Backward_ControlPin, LOW);  //home raggiunta
     break;
  
     case 1:
-      digitalWrite(mat_X_Forward_ControlPin, HIGH);
-      delay(7000);
+      //MAT_X avanti
+      marcia_avanti = true;
+      digitalWrite(pinza_aggancio_control_pin, HIGH);  //aggancio la cassa
+      digitalWrite(mat_X_Forward_ControlPin, HIGH);    //Motore x avanti
+      while(conta_impulsi_X <= 700);
       digitalWrite(mat_X_Forward_ControlPin, LOW);
+      digitalWrite(pinza_aggancio_control_pin, LOW); //sgancio
       casse_immagazzinate++;
+      //MAT_X indietro
+      marcia_avanti = false;
+      digitalWrite(mat_X_Backward_ControlPin, HIGH);  //Motore x indietro
+      while(conta_impulsi_X >= 0); //Ritorno alla posizione iniziale
+      digitalWrite(mat_X_Backward_ControlPin, LOW);  //home raggiunta
     break;
 
     case 2:
-      //Aziono MAT_X per 4 secondi
+      //MAT_X avanti
+      marcia_avanti = true;
+      digitalWrite(pinza_aggancio_control_pin, HIGH);  //aggancio la cassa
       digitalWrite(mat_X_Forward_ControlPin, HIGH);
-      delay(4000);
+      while(conta_impulsi_X <= 400);
       digitalWrite(mat_X_Forward_ControlPin, LOW);
-       //Aziono MAT_Y per 3 secondi
+      //MAT_Y avanti
       digitalWrite(mat_Y_Forward_ControlPin, HIGH);
-      delay(3000);
+      while(conta_impulsi_Y <= 300);
       digitalWrite(mat_Y_Forward_ControlPin, LOW);
+      digitalWrite(pinza_aggancio_control_pin, LOW); //sgancio
       casse_immagazzinate++;
-      break;
+      //Torno indietro lungo Y
+      marcia_avanti = true;
+      digitalWrite(mat_Y_Backward_ControlPin, HIGH);  //Motore y indietro
+      while(conta_impulsi_Y >= 0); //Ritorno a y = 0
+      digitalWrite(mat_Y_Backward_ControlPin, LOW);  //y=0 raggiunta
+       //Torno indietro lungo X
+      digitalWrite(mat_X_Backward_ControlPin, HIGH);  //Motore x indietro
+      while(conta_impulsi_X >= 0); //Ritorno a x = 0
+      digitalWrite(mat_X_Backward_ControlPin, LOW);  //x=0 raggiunta
+    break;
 
     case 3:
-      //Aziono MAT_X per 7 secondi
+      //MAT_X avanti
+      marcia_avanti = true;
+      digitalWrite(pinza_aggancio_control_pin, HIGH);  //aggancio la cassa
       digitalWrite(mat_X_Forward_ControlPin, HIGH);
-      delay(7000);
+      while(conta_impulsi_X <= 700);
       digitalWrite(mat_X_Forward_ControlPin, LOW);
-       //Aziono MAT_Y per 3 secondi
+      //MAT_Y avanti
       digitalWrite(mat_Y_Forward_ControlPin, HIGH);
-      delay(3000);
+      while(conta_impulsi_Y <= 300);
       digitalWrite(mat_Y_Forward_ControlPin, LOW);
+      digitalWrite(pinza_aggancio_control_pin, LOW); //sgancio
       casse_immagazzinate++;
-
-
-    stop = true;
-    break;
+      //Torno indietro lungo X
+      marcia_avanti = false;
+      digitalWrite(mat_Y_Backward_ControlPin, HIGH);  //Motore y indietro
+      while(conta_impulsi_Y >= 0); //Ritorno a y = 0
+      digitalWrite(mat_Y_Backward_ControlPin, LOW);  //y=0 raggiunta
+       //Torno indietro lungo Y
+      digitalWrite(mat_X_Backward_ControlPin, HIGH);  //Motore x indietro
+      while(conta_impulsi_X >= 0); //Ritorno a x = 0
+      digitalWrite(mat_X_Backward_ControlPin, LOW);  //x=0 raggiunta
+      stop = true;
+      break;
   
     default: 
     stop = true;
@@ -237,8 +283,7 @@ while(casse_immagazzinate<4)
   //
   Nel caso di fine magazzino ritorno al setup e mi blocco sullo START
   if(stop == true) setup(); 
-}
-//da ripetere 4 volte
-
+ } 
+     //Il magazzino è pieno
 
 }
